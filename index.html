@@ -29,27 +29,29 @@
         <div id="success-msg">Пароль верный! Операция подтверждена.</div>
     </div>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+ <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
 
-        // Получаем сумму из ссылки сразу при открытии
-        const params = new URLSearchParams(window.location.search);
-        const amount = params.get('sum') || '0';
-        document.getElementById('sum-display').innerText = amount;
+    // 1. Создаем объект для поиска параметров
+    const params = new URLSearchParams(window.location.search);
+    
+    // 2. Достаем число из "sum"
+    const amount = params.get('sum') || 'Сумма не найдена';
+    
+    // 3. Записываем это число в блок с ID "sum-display"
+    document.getElementById('sum-display').innerText = amount;
 
-        function verify() {
-            const pin = document.getElementById('pass-input').value;
-            if (pin === '9595') {
-                document.getElementById('auth-form').style.display = 'none';
-                document.getElementById('success-msg').style.display = 'block';
-                // Можно добавить закрытие приложения через 2 секунды
-                setTimeout(() => { tg.close(); }, 2000);
-            } else {
-                alert('Неверный пароль!');
-                document.getElementById('pass-input').value = '';
-            }
+    function verify() {
+        const pin = document.getElementById('pass-input').value;
+        if (pin === '9595') {
+            document.getElementById('auth-form').style.display = 'none';
+            document.getElementById('success-msg').style.display = 'block';
+        } else {
+            alert('Неверный пароль!');
         }
-    </script>
+    }
+</script>
+    
 </body>
 </html>
