@@ -3,40 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Mini App</title>
+    <title>Платеж</title>
     <script src="https://telegram.org"></script>
     <style>
         body { font-family: sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; width: 80%; }
-        h1 { color: #333; font-size: 18px; margin-bottom: 20px; }
-        .sum-box { font-size: 32px; font-weight: bold; color: #0088cc; margin-bottom: 20px; }
-        input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 16px; }
-        button { background: #0088cc; color: white; border: none; padding: 12px 25px; border-radius: 10px; font-size: 16px; cursor: pointer; width: 100%; }
-        #app-content { display: none; }
+        .container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; width: 85%; }
+        .label { color: #888; font-size: 14px; margin-bottom: 5px; }
+        .sum-box { font-size: 32px; font-weight: bold; color: #000; margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        input { width: 100%; padding: 15px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; font-size: 16px; background: #f9f9f9; }
+        button { background: #0088cc; color: white; border: none; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; }
+        #success-msg { display: none; color: green; margin-top: 15px; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Экран логина -->
-        <div id="login-screen">
-            <h1>Введите пароль</h1>
-            <input type="password" id="pass-input" placeholder="Пароль">
-            <button onclick="verify()">Войти</button>
-        </div>
+        <div class="label">Сумма к получению:</div>
+        <!-- СУММА ВИДНА СРАЗУ -->
+        <div class="sum-box" id="sum-display">Загрузка...</div>
 
-        <!-- Экран с суммой -->
-        <div id="app-content">
-            <h1>Сумма к оплате</h1>
-            <div class="sum-box" id="sum-display">0</div>
-            <button onclick="window.Telegram.WebApp.close()">Завершить</button>
+        <div id="auth-form">
+            <input type="password" id="pass-input" placeholder="Введите пароль доступа">
+            <button onclick="verify()">Подтвердить</button>
         </div>
+        
+        <div id="success-msg">Пароль верный! Операция подтверждена.</div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Разворачиваем на весь экран
+        tg.expand();
 
-        // Получаем число из ссылки бота (?sum=123)
+        // Получаем сумму из ссылки сразу при открытии
         const params = new URLSearchParams(window.location.search);
         const amount = params.get('sum') || '0';
         document.getElementById('sum-display').innerText = amount;
@@ -44,10 +41,13 @@
         function verify() {
             const pin = document.getElementById('pass-input').value;
             if (pin === '9595') {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('app-content').style.display = 'block';
+                document.getElementById('auth-form').style.display = 'none';
+                document.getElementById('success-msg').style.display = 'block';
+                // Можно добавить закрытие приложения через 2 секунды
+                setTimeout(() => { tg.close(); }, 2000);
             } else {
                 alert('Неверный пароль!');
+                document.getElementById('pass-input').value = '';
             }
         }
     </script>
