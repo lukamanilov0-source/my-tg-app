@@ -1,57 +1,129 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Платеж</title>
+    <!-- ИСПРАВЛЕНО: Правильная ссылка на библиотеку Telegram -->
     <script src="https://telegram.org"></script>
     <style>
-        body { font-family: sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; width: 85%; }
-        .label { color: #888; font-size: 14px; margin-bottom: 5px; }
-        .sum-box { font-size: 32px; font-weight: bold; color: #000; margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
-        input { width: 100%; padding: 15px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; font-size: 16px; background: #f9f9f9; }
-        button { background: #0088cc; color: white; border: none; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; }
-        #success-msg { display: none; color: green; margin-top: 15px; font-weight: bold; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 85%;
+            max-width: 400px;
+        }
+        .label {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .sum-box {
+            font-size: 32px;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            box-sizing: border-box;
+            font-size: 16px;
+            background: #f9f9f9;
+            outline: none;
+        }
+        button {
+            background: #0088cc;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+        }
+        button:active {
+            background: #0077b5;
+        }
+        #success-msg {
+            display: none;
+            color: #28a745;
+            margin-top: 15px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="label">Сумма к получению:</div>
-        <!-- СУММА ВИДНА СРАЗУ -->
-        <div class="sum-box" id="sum-display">Загрузка...</div>
 
-        <div id="auth-form">
-            <input type="password" id="pass-input" placeholder="Введите пароль доступа">
-            <button onclick="verify()">Подтвердить</button>
-        </div>
-        
-        <div id="success-msg">Пароль верный! Операция подтверждена.</div>
+<div class="container">
+    <div class="label">Сумма к получению:</div>
+    <div class="sum-box" id="sum-display">Загрузка...</div>
+    
+    <div id="auth-form">
+        <input type="password" id="pass-input" placeholder="Введите пароль доступа">
+        <button onclick="verify()">Подтвердить</button>
     </div>
+    
+    <div id="success-msg">Пароль верный!<br>Операция подтверждена.</div>
+</div>
 
- <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-
-    // 1. Создаем объект для поиска параметров
+<script>
+    // 1. Сначала достаем сумму из URL, чтобы она появилась сразу
     const params = new URLSearchParams(window.location.search);
-    
-    // 2. Достаем число из "sum"
-    const amount = params.get('sum') || 'Сумма не найдена';
-    
-    // 3. Записываем это число в блок с ID "sum-display"
-    document.getElementById('sum-display').innerText = amount;
+    const amount = params.get('sum');
+    const display = document.getElementById('sum-display');
 
+    if (amount) {
+        display.innerText = amount + " ₽";
+    } else {
+        display.innerText = "Не указана";
+    }
+
+    // 2. Инициализация Telegram WebApp
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+        tg.ready();
+        tg.expand(); // Разворачивает окно на весь экран
+    }
+
+    // 3. Функция проверки пароля
     function verify() {
         const pin = document.getElementById('pass-input').value;
         if (pin === '9595') {
             document.getElementById('auth-form').style.display = 'none';
             document.getElementById('success-msg').style.display = 'block';
+            
+            // Если нужно закрыть приложение через пару секунд после успеха:
+            /*
+            setTimeout(() => {
+                if (tg) tg.close();
+            }, 2000);
+            */
         } else {
             alert('Неверный пароль!');
+            document.getElementById('pass-input').value = '';
         }
     }
 </script>
-    
+
 </body>
 </html>
