@@ -138,10 +138,17 @@
         <div id="success-msg">Покупка прошла<br>на ура! Спасибо!</div>
     </div>
 
-    <div class="qr-section">
-        <img class="qr-image" src="https://qrserver.com" alt="QR">
+        <div class="qr-section">
+        <!-- Белый контейнер вокруг QR гарантирует его считывание -->
+        <div style="background: white; padding: 10px; border-radius: 12px; display: inline-block;">
+            <img id="qr-img" class="qr-image" 
+                 src="https://qrserver.com" 
+                 alt="QR" 
+                 style="display: block; width: 150px; height: 150px;">
+        </div>
         <div class="qr-label">QR Для оплаты!</div>
     </div>
+
 
 <script>
     const params = new URLSearchParams(window.location.search);
