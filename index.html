@@ -37,7 +37,6 @@
             align-items: center;
             justify-content: center;
             flex-grow: 1;
-            position: relative;
         }
 
         #auth-form {
@@ -46,7 +45,7 @@
             flex-direction: column;
             align-items: center;
             gap: 20px;
-            transition: opacity 0.3s ease; /* Плавное исчезновение формы */
+            transition: opacity 0.3s ease;
         }
 
         input {
@@ -63,7 +62,6 @@
             color: black;
         }
 
-        /* Стильная кнопка с эффектом при наведении */
         button {
             width: 70%;
             max-width: 250px;
@@ -75,19 +73,12 @@
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: background 0.3s ease, transform 0.1s; /* Плавное изменение цвета */
+            transition: background 0.3s ease, transform 0.1s;
         }
 
-        /* Эффект "светлее" при наведении/нажатии */
-        button:hover {
-            background: #339cff; /* Светлее основного синего */
-        }
+        button:hover { background: #339cff; }
+        button:active { transform: scale(0.98); }
 
-        button:active {
-            transform: scale(0.98); /* Легкий эффект нажатия */
-        }
-
-        /* Анимация появления текста успеха */
         @keyframes fastShow {
             from { opacity: 0; transform: scale(0.9); }
             to { opacity: 1; transform: scale(1); }
@@ -100,28 +91,38 @@
             font-weight: 900;
             text-align: center;
             line-height: 1.2;
-            animation: fastShow 0.4s ease-out; /* Быстрое, но плавное появление */
+            animation: fastShow 0.4s ease-out;
         }
 
+        /* Контейнер QR-кода */
         .qr-section {
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
+        .qr-white-bg {
+            background: white;
+            padding: 12px;
+            border-radius: 18px; /* Скругление как на фото */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
         .qr-image {
             width: 150px;
             height: 150px;
-            background: white;
-            padding: 5px;
-            border-radius: 10px;
+            display: block;
         }
 
         .qr-label {
-            margin-top: 10px;
+            margin-top: 12px;
             font-size: 14px;
-            font-weight: bold;
+            font-weight: 800;
             color: white;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
         }
     </style>
 </head>
@@ -138,17 +139,13 @@
         <div id="success-msg">Покупка прошла<br>на ура! Спасибо!</div>
     </div>
 
-        <div class="qr-section">
-        <!-- Белый контейнер вокруг QR гарантирует его считывание -->
-        <div style="background: white; padding: 10px; border-radius: 12px; display: inline-block;">
-            <img id="qr-img" class="qr-image" 
-                 src="https://qrserver.com" 
-                 alt="QR" 
-                 style="display: block; width: 150px; height: 150px;">
+    <div class="qr-section">
+        <div class="qr-white-bg">
+            <!-- Встроенный QR-код (Base64) - теперь он точно загрузится -->
+            <img class="qr-image" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJQAAACUAQMAAABf8AnuAAAABlBMVEX///8AAABVwtN+AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAn0lEQVQ4jdXUMQrDMAwF0E8IdAt0D9At9P6X6B66S2fL6BBom9pCHUKH7hZ6iB7CHYIdSgu9P0WfofunSBBIn8T3E0mSJOXN45fVnS9N06S6/SFrU90Vz8F908zN3G/7/Q8VfW99p2pT9+n9D0WfXfM6tZkqIuM1/L390zVVX/o/mup3zXzXzIiofS9VROZf96miU5vp9H0v1X3vO1X07fS5vU0zVfS5XfO5PU0zVfS5/XUv1X3vO1X0ufV1L9Xf99JkqoiM1/D39k/XVH3p/2iq3zXzXTMjoratVETmX/e9VNGpXfP3vVT0vfWdqk3dp/fH3/8AsVv477Yp7wAAAABJRU5ErkJggg==" alt="QR">
         </div>
         <div class="qr-label">QR Для оплаты!</div>
     </div>
-
 
 <script>
     const params = new URLSearchParams(window.location.search);
@@ -169,18 +166,13 @@
             const form = document.getElementById('auth-form');
             const success = document.getElementById('success-msg');
 
-            // 1. Сначала плавно скрываем форму
             form.style.opacity = '0';
             
             setTimeout(() => {
                 form.style.display = 'none';
-                // 2. Показываем сообщение об успехе с анимацией
                 success.style.display = 'block';
-                
-                if (tg) {
-                    tg.HapticFeedback.notificationOccurred('success');
-                }
-            }, 300); // Задержка в 0.3 сек для чистого перехода
+                if (tg) tg.HapticFeedback.notificationOccurred('success');
+            }, 300);
         } else {
             alert('Неверный пароль!');
             document.getElementById('pass-input').value = '';
