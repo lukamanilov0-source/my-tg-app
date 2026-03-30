@@ -2,125 +2,155 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Платеж</title>
-    <!-- ИСПРАВЛЕНО: Правильная ссылка на библиотеку Telegram -->
     <script src="https://telegram.org"></script>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            /* Градиент как на скриншоте */
+            background: linear-gradient(180deg, #ff00ff 0%, #a020f0 50%, #8a2be2 100%);
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between; /* Распределяем элементы по высоте */
+            color: white;
+            overflow: hidden;
+        }
+
+        .top-section {
+            margin-top: 80px;
+            text-align: center;
+        }
+
+        .sum-box {
+            font-size: 36px;
+            font-weight: 900;
+            color: #00ff00; /* Ярко-зеленый неоновый цвет */
+            text-decoration: underline;
+            text-transform: uppercase;
+        }
+
+        .middle-section {
+            width: 100%;
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
         }
-        .container {
+
+        /* Поле ввода в стиле капсулы */
+        input {
+            width: 80%;
+            max-width: 320px;
+            padding: 18px 25px;
+            border-radius: 50px;
+            border: none;
             background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            font-size: 16px;
+            font-weight: bold;
             text-align: center;
-            width: 85%;
-            max-width: 400px;
+            outline: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-        .label {
-            color: #888;
-            font-size: 14px;
-            margin-bottom: 5px;
+
+        input::placeholder {
+            color: #000;
         }
-        .sum-box {
-            font-size: 32px;
+
+        .bottom-section {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        /* Стилизация QR-кода */
+        .qr-container {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .qr-container img {
+            display: block;
+            width: 150px;
+            height: 150px;
+        }
+
+        .qr-label {
+            font-size: 12px;
             font-weight: bold;
             color: #000;
-            margin-bottom: 30px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 15px;
+            text-transform: uppercase;
         }
-        input {
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            box-sizing: border-box;
-            font-size: 16px;
-            background: #f9f9f9;
-            outline: none;
-        }
-        button {
-            background: #0088cc;
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            transition: background 0.2s;
-        }
-        button:active {
-            background: #0077b5;
-        }
+
         #success-msg {
             display: none;
-            color: #28a745;
-            margin-top: 15px;
+            background: rgba(0, 255, 0, 0.9);
+            padding: 20px;
+            border-radius: 20px;
+            color: black;
             font-weight: bold;
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="label">Сумма к получению:</div>
-    <div class="sum-box" id="sum-display">Загрузка...</div>
-    
-    <div id="auth-form">
-        <input type="password" id="pass-input" placeholder="Введите пароль доступа">
-        <button onclick="verify()">Подтвердить</button>
+    <div class="top-section">
+        <div class="sum-box" id="sum-display">ИТОГО: ЗАГРУЗКА...</div>
     </div>
-    
-    <div id="success-msg">Пароль верный!<br>Операция подтверждена.</div>
-</div>
+
+    <div class="middle-section" id="auth-form">
+        <input type="password" id="pass-input" placeholder="поле для пароля" oninput="checkPass()">
+    </div>
+
+    <div id="success-msg">ОПЛАТА ПОДТВЕРЖДЕНА!</div>
+
+    <div class="bottom-section">
+        <div class="qr-container">
+            <!-- Замените ссылку на ваш реальный QR-код -->
+            <img src="https://qrserver.com" alt="QR">
+        </div>
+        <div class="qr-label">QR Для оплаты!</div>
+    </div>
 
 <script>
-    // 1. Сначала достаем сумму из URL, чтобы она появилась сразу
     const params = new URLSearchParams(window.location.search);
     const amount = params.get('sum');
     const display = document.getElementById('sum-display');
 
     if (amount) {
-        display.innerText = amount + " ₽";
+        display.innerText = "ИТОГО: " + amount + " ₽";
     } else {
-        display.innerText = "Не указана";
+        display.innerText = "ИТОГО: СУММА";
     }
 
-    // 2. Инициализация Telegram WebApp
     const tg = window.Telegram?.WebApp;
     if (tg) {
         tg.ready();
-        tg.expand(); // Разворачивает окно на весь экран
+        tg.expand();
+        tg.setHeaderColor('#ff00ff'); // Цвет шапки в тон фона
     }
 
-    // 3. Функция проверки пароля
-    function verify() {
+    // Автоматическая проверка при вводе
+    function checkPass() {
         const pin = document.getElementById('pass-input').value;
         if (pin === '9595') {
             document.getElementById('auth-form').style.display = 'none';
             document.getElementById('success-msg').style.display = 'block';
             
-            // Если нужно закрыть приложение через пару секунд после успеха:
-            /*
+            if (tg) {
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+
             setTimeout(() => {
                 if (tg) tg.close();
-            }, 2000);
-            */
-        } else {
-            alert('Неверный пароль!');
-            document.getElementById('pass-input').value = '';
+            }, 3000);
         }
     }
 </script>
