@@ -9,42 +9,50 @@
         body {
             margin: 0;
             padding: 0;
-            /* Градиент как на скриншоте */
-            background: linear-gradient(180deg, #ff00ff 0%, #a020f0 50%, #8a2be2 100%);
-            font-family: 'Arial', sans-serif;
+            background: linear-gradient(180deg, #ff00ff 0%, #a020f0 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between; /* Распределяем элементы по высоте */
+            justify-content: space-between;
             color: white;
             overflow: hidden;
-        }
-
-        .top-section {
-            margin-top: 80px;
-            text-align: center;
+            box-sizing: border-box;
+            padding: 60px 20px;
         }
 
         .sum-box {
-            font-size: 36px;
-            font-weight: 900;
-            color: #00ff00; /* Ярко-зеленый неоновый цвет */
-            text-decoration: underline;
-            text-transform: uppercase;
+            font-size: 32px;
+            font-weight: 800;
+            border-bottom: 3px solid white;
+            padding-bottom: 5px;
+            text-align: center;
         }
 
-        .middle-section {
+        .content-area {
             width: 100%;
             display: flex;
+            flex-direction: column;
+            align-items: center;
             justify-content: center;
+            flex-grow: 1;
+            position: relative;
         }
 
-        /* Поле ввода в стиле капсулы */
+        #auth-form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            transition: opacity 0.3s ease; /* Плавное исчезновение формы */
+        }
+
         input {
-            width: 80%;
+            width: 85%;
             max-width: 320px;
-            padding: 18px 25px;
+            padding: 18px;
             border-radius: 50px;
             border: none;
             background: white;
@@ -52,105 +60,123 @@
             font-weight: bold;
             text-align: center;
             outline: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            color: black;
         }
 
-        input::placeholder {
-            color: #000;
-        }
-
-        .bottom-section {
-            margin-bottom: 40px;
-            text-align: center;
-        }
-
-        /* Стилизация QR-кода */
-        .qr-container {
-            background: white;
-            padding: 10px;
-            border-radius: 5px;
-            display: inline-block;
-            margin-bottom: 10px;
-        }
-
-        .qr-container img {
-            display: block;
-            width: 150px;
-            height: 150px;
-        }
-
-        .qr-label {
-            font-size: 12px;
+        /* Стильная кнопка с эффектом при наведении */
+        button {
+            width: 70%;
+            max-width: 250px;
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            background: #007bff;
+            color: white;
+            font-size: 16px;
             font-weight: bold;
-            color: #000;
-            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.1s; /* Плавное изменение цвета */
+        }
+
+        /* Эффект "светлее" при наведении/нажатии */
+        button:hover {
+            background: #339cff; /* Светлее основного синего */
+        }
+
+        button:active {
+            transform: scale(0.98); /* Легкий эффект нажатия */
+        }
+
+        /* Анимация появления текста успеха */
+        @keyframes fastShow {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         #success-msg {
             display: none;
-            background: rgba(0, 255, 0, 0.9);
-            padding: 20px;
-            border-radius: 20px;
-            color: black;
+            color: #00ff00;
+            font-size: 34px;
+            font-weight: 900;
+            text-align: center;
+            line-height: 1.2;
+            animation: fastShow 0.4s ease-out; /* Быстрое, но плавное появление */
+        }
+
+        .qr-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .qr-image {
+            width: 150px;
+            height: 150px;
+            background: white;
+            padding: 5px;
+            border-radius: 10px;
+        }
+
+        .qr-label {
+            margin-top: 10px;
+            font-size: 14px;
             font-weight: bold;
-            position: fixed;
-            top: 50%;
-            transform: translateY(-50%);
+            color: white;
         }
     </style>
 </head>
 <body>
 
-    <div class="top-section">
-        <div class="sum-box" id="sum-display">ИТОГО: ЗАГРУЗКА...</div>
-    </div>
+    <div class="sum-box" id="sum-display">Итого: Сумма</div>
 
-    <div class="middle-section" id="auth-form">
-        <input type="password" id="pass-input" placeholder="поле для пароля" oninput="checkPass()">
-    </div>
-
-    <div id="success-msg">ОПЛАТА ПОДТВЕРЖДЕНА!</div>
-
-    <div class="bottom-section">
-        <div class="qr-container">
-            <!-- Замените ссылку на ваш реальный QR-код -->
-            <img src="https://qrserver.com" alt="QR">
+    <div class="content-area">
+        <div id="auth-form">
+            <input type="password" id="pass-input" placeholder="поле для пароля">
+            <button onclick="verify()">Подтвердить</button>
         </div>
+
+        <div id="success-msg">Покупка прошла<br>на ура! Спасибо!</div>
+    </div>
+
+    <div class="qr-section">
+        <img class="qr-image" src="https://qrserver.com" alt="QR">
         <div class="qr-label">QR Для оплаты!</div>
     </div>
 
 <script>
     const params = new URLSearchParams(window.location.search);
     const amount = params.get('sum');
-    const display = document.getElementById('sum-display');
-
     if (amount) {
-        display.innerText = "ИТОГО: " + amount + " ₽";
-    } else {
-        display.innerText = "ИТОГО: СУММА";
+        document.getElementById('sum-display').innerText = "Итого: " + amount + " ₽";
     }
 
     const tg = window.Telegram?.WebApp;
     if (tg) {
         tg.ready();
         tg.expand();
-        tg.setHeaderColor('#ff00ff'); // Цвет шапки в тон фона
     }
 
-    // Автоматическая проверка при вводе
-    function checkPass() {
+    function verify() {
         const pin = document.getElementById('pass-input').value;
         if (pin === '9595') {
-            document.getElementById('auth-form').style.display = 'none';
-            document.getElementById('success-msg').style.display = 'block';
-            
-            if (tg) {
-                tg.HapticFeedback.notificationOccurred('success');
-            }
+            const form = document.getElementById('auth-form');
+            const success = document.getElementById('success-msg');
 
+            // 1. Сначала плавно скрываем форму
+            form.style.opacity = '0';
+            
             setTimeout(() => {
-                if (tg) tg.close();
-            }, 3000);
+                form.style.display = 'none';
+                // 2. Показываем сообщение об успехе с анимацией
+                success.style.display = 'block';
+                
+                if (tg) {
+                    tg.HapticFeedback.notificationOccurred('success');
+                }
+            }, 300); // Задержка в 0.3 сек для чистого перехода
+        } else {
+            alert('Неверный пароль!');
+            document.getElementById('pass-input').value = '';
         }
     }
 </script>
